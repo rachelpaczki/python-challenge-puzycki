@@ -15,10 +15,8 @@ import pandas as pd
 df = pd.read_csv(pypoll_csv)
 
 totalballots = []
-county = []
+ballotData = []
 candidates = []
-voterpercentage = []
-totalvotes = 0
 winningvotes = 0
 
 with open(pypoll_csv) as csvfile:
@@ -26,16 +24,13 @@ with open(pypoll_csv) as csvfile:
     Headers = next(csv_reader)
 
     for row in csv_reader:
-        totalballots.append([0])
-        county.append([1])
+        ballotData.append(row[0])
 
 # Calculate unique candidates based upon csv file
-for row in csv_reader:
-    totalvotes += 1
+for row in ballotData:
     
     if row[2] not in candidates:
         candidates.append(row[2])
-        totalballots.append([1])
 
     else: 
         uniquecandidates = candidates.index(row[2])
@@ -55,25 +50,20 @@ for i in range(len(totalballots)):
         winner = uniquecandidates[i]
 
 # Create Analysis output for printing
-with open(output_file,'w') as textfile:
-    analysisoutput = (f"Election Results\n",
+with open(output_file,'w') as text_file:
+    text_file.write(f"Election Results\n",
                   f"#-----------------------------",
                   f"Total Votes: {totalballots}\n",
-                  f"#-----------------------------",
-)
+                  f"#-----------------------------")
 
 for i in range(len(candidates)):
-    textfile.write(f"{uniquecandidates:[i]}: {voterpercentage[i]} ({totalballots[i]})\n")
+    text_file.write(f"{uniquecandidates:[i]}: {voterpercentage[i]} ({totalballots[i]})\n")
                    
     output_file.write(f"#-----------------------------",
                       f"Winner: {winner}\n",
-                      f"#-----------------------------",
-    )
-
-# Print out analysis output
-print(analysisoutput)
+                      f"#-----------------------------")
 
 # Send data to text file in analysis
-with open(output_file,'w') as textfile:
-    textfile.write(analysisoutput)
+with open(output_file,'r') as text_file:
+    print(text_file)
 
