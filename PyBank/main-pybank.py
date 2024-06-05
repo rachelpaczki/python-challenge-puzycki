@@ -6,7 +6,6 @@ pybank_csv = os.path.join("..", "Resources", "budget_data.csv")
 output_file = os.path.join("..","Analysis", "PyBank_output.txt")
 
 # Start reader access to data in csv file
-
 with open(pybank_csv) as csvfile:
     csv_reader = csv.reader(pybank_csv,delimiter=",")
 
@@ -14,59 +13,83 @@ with open(pybank_csv) as csvfile:
 import pandas as pd
 df = pd.read_csv(pybank_csv)
 
-date = []
-profit_losses = []
-profitchanges = []
+#Set variables
+totalmonths = 0
+total = 0
+profitlosses = []
+dates = []
+monthlychanges = []
 
 # Define dates, profit_losses, and profit changes 
 with open(pybank_csv) as csvfile:
-    csv_reader = csv.reader(pybank_csv,delimiter=",")
-    Headers = next(csv_reader)
-
+    csv_reader = csv.reader(csvfile, delimiter = ',')
+    next(csv_reader)
+    
     for row in csv_reader:
-        date.append([0])
-        profit_losses.append([1])
+        totalmonths += 1
+        total += int(row[1])
+        profitlosses.append(row[1])
+        dates.append(row[0])
 
 
 # Count the months avaliable in the csv file
-totalmonths = len(date)
+totalmonths = len(dates)
+totalmonths
 
 # Calculate the net total for profit/losses
-totalprofitlosses = 0
+firstprofitloss = int(profitlosses[0])
 
-for i in totalprofitlosses:
-    totalprofitlosses = i +totalprofitlosses
-
-changeprofitlosses = [totalprofitlosses[i+1]+totalprofitlosses[i] for i in range(totalmonths)]
+# Set the loop
+for i in range(1, len(profitlosses)):
+    monthlychanges.append(int(profitlosses[i])-firstprofitloss)
+    firstprofitloss = int(profitlosses[i])
+    i += 1
 
 # Calculate the average change for total profit losses
-averagechange = average(changeprofitlosses)
+averagechange = sum(monthlychanges)/len(monthlychanges)
+averagechange
 
 # Calculate the greatest increase and decrease in profits
-greatestincrease = 0
-greatestdecrease = 0
+greatestincrease = max(monthlychanges)
+greatestdecrease = min(monthlychanges)
 
-for i in range(len(date)-1):
-    if totalprofitlosses[i] > greatestincrease:
-        greatestincrease = totalprofitlosses[i]
+greatestincrease, greatestdecrease
 
-    if totalprofitlosses[i] < greatestdecrease:
-        greatestdecrease = totalprofitlosses[i]
+#Find month index for the Max Increase and Max Decrease
+for i in range(len(monthlychanges)):
+    if monthlychanges[i] == greatestincrease:
+        maxindex = (i - 1)
+    elif monthlychanges[i] == greatestdecrease:
+        minindex = (i - 1)
+    else:
+        i += 1
+
+greatest_inc = dates[maxindex]
+greatest_dec = dates[minindex]
+
+greatest_inc, greatest_dec
 
 # Create Analysis output for printing
 analysisoutput = (f"Financial Analysis\n",
                   f"#-----------------------------",
                   f"Total Months: {totalmonths}\n",
-                  f"Total: ${totalprofitlosses}\n",
+                  f"Total: ${total}\n",
                   f"Average Change: ${averagechange}\n",
-                  f"Greatest Increase in Profits: ${greatestincrease}\n",
-                  f"Greatest Decrease in Profits: ${greatestdecrease}\n"
+                  f"Greatest Increase in Profits: {greatest_inc} (${greatestincrease})\n",
+                  f"Greatest Decrease in Profits: {greatest_dec} (${greatestdecrease})\n"
 )
 
 # Print out analysis output
 print(analysisoutput)
 
 # Send data to text file in analysis
-with open(output_file,'w') as textfile:
-    textfile.write(analysisoutput)
+with open(output_file,'w') as text:
+    text.write(f"Financial Analysis\n")
+    text.write(f"#-----------------------------\n")
+    text.write(f"Total Months: {totalmonths}\n")
+    text.write(f"Total: ${total}\n")
+    text.write(f"Average Change: ${averagechange}\n")
+    text.write(f"Greatest Increase in Profits: {greatest_inc} (${greatestincrease})\n")
+    text.write(f"Greatest Decrease in Profits: {greatest_dec} (${greatestdecrease})\n")
+
     

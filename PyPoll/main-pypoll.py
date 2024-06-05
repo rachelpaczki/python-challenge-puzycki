@@ -2,68 +2,55 @@
 import os
 import csv
 
-pypoll_csv = os.path.join("..", "Resources", "election_data.csv")
-output_file = os.path.join("..","Analysis", "PyPoll_output.txt")
+candidates = []
+candidate_list = {}
+vote_count = 0
+
+pypoll_csv = os.path.join("/Users/rachelpuzycki/Desktop/NW Bootcamp/python-challenge-puzycki/PyPoll/Resources/election_data.csv")
+output_file = os.path.join("/Users/rachelpuzycki/Desktop/NW Bootcamp/python-challenge-puzycki/PyPoll/Analysis/PyPoll_output.txt")
 
 # Start reader access to data in csv file
-
 with open(pypoll_csv) as csvfile:
-    csv_reader = csv.reader(pypoll_csv,delimiter=",")
-
-# Prepare data for usage 
-import pandas as pd
-df = pd.read_csv(pypoll_csv)
-
-totalballots = []
-ballotData = []
-candidates = []
-winningvotes = 0
-
-with open(pypoll_csv) as csvfile:
-    csv_reader = csv.reader(pypoll_csv,delimiter=",")
+    csv_reader = csv.reader(csvfile,delimiter=",")
     Headers = next(csv_reader)
 
+    # Loop through rows to append data
     for row in csv_reader:
-        ballotData.append(row[0])
-
-# Calculate unique candidates based upon csv file
-for row in ballotData:
-    
-    if row[2] not in candidates:
-        candidates.append(row[2])
-
-    else: 
-        uniquecandidates = candidates.index(row[2])
-        totalballots[uniquecandidates] += 1
-
-# Calculate voterpercent for each unique candidate
-for i in range(len(totalballots)):
-    voterpercentage.append(totalballots[i]/totalvotes)
-
-    # Convert voterpercentage to percentage
-    voterpercentage = voterpercentage*100
-
-# Calculate the overall winner from each unique candidate
-for i in range(len(totalballots)):
-    if totalballots > winningvotes:
-        winningvotes = totalballots[i]
-        winner = uniquecandidates[i]
+        vote_count += 1
+        row_cand = row[2]
+        if row_cand in candidate_list.keys():
+            candidate_list[row_cand] +=1
+        else:
+            candidate_list[row_cand] = 1
 
 # Create Analysis output for printing
-with open(output_file,'w') as text_file:
-    text_file.write(f"Election Results\n",
-                  f"#-----------------------------",
-                  f"Total Votes: {totalballots}\n",
-                  f"#-----------------------------")
+winner = ""
+max_v = 0
 
-for i in range(len(candidates)):
-    text_file.write(f"{uniquecandidates:[i]}: {voterpercentage[i]} ({totalballots[i]})\n")
-                   
-    output_file.write(f"#-----------------------------",
-                      f"Winner: {winner}\n",
-                      f"#-----------------------------")
+for candidate in candidate_list.keys():
+    votes = candidate_list[candidate]
+    perc = 100 * (votes / vote_count)
+    max_votes = f"{candidate}: {round(perc, 3)}% ({votes})\n"
+    
+    #Winner
+    if votes > max_v:
+        winner = candidate
+        max_v = votes
+
+# Print out Analysis
+print(f"Election Results\n",
+      f"#----------------------------\n",
+      f"Total Votes: {vote_count}\n",
+      f"#----------------------------\n",
+      f"Winner: {winner}\n",
+      f"#----------------------------\n"
+      )
 
 # Send data to text file in analysis
-with open(output_file,'r') as text_file:
-    print(text_file)
-
+with open(output_file,'w') as text:
+    text.write(f"Election Results\n")
+    text.write(f"#----------------------------\n")
+    text.write(f"Total Votes: {vote_count}\n")
+    text.write(f"#----------------------------\n")
+    text.write(f"Winner: {winner}\n")
+    text.write(f"#----------------------------\n")
